@@ -1,15 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
-import { getConnection } from 'typeorm';
 import { Mark } from './entities/mark.entity';
 import { Student } from '../students/entities/student.entity';
 import { Course } from '../courses/entities/course.entity';
-// import { Lector } from '../lectors/entities/lector.entity';
+import { Lector } from '../lectors/entities/lector.entity';
 
 import { CreateMarkDto } from './dto/create-mark.dto';
 
@@ -18,6 +13,12 @@ export class MarksService {
   constructor(
     @InjectRepository(Mark)
     private readonly marksRepository: Repository<Mark>,
+    @InjectRepository(Course)
+    private readonly courseRepository: Repository<Course>,
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
+    @InjectRepository(Lector)
+    private readonly lectorRepository: Repository<Lector>,
   ) {}
 
   async getAllMarks(): Promise<Mark[]> {
@@ -29,33 +30,33 @@ export class MarksService {
   }
 
   async addMark(markCreateSchema: CreateMarkDto): Promise<void> {
-    const { mark, courseId, studentId, lectorId } = markCreateSchema;
+    const { mark, course, student, lector } = markCreateSchema;
 
-    const course = await this.checkEntityExistence(
-      Course,
-      courseId,
+    const existingCourse = await this.checkEntityExistence(
+      this.courseRepository,
+      course,
       'Course not found',
     );
-    const student = await this.checkEntityExistence(
-      Student,
-      studentId,
+    const existingStudent = await this.checkEntityExistence(
+      this.studentRepository,
+      student,
       'Student not found',
     );
-    const lector = await this.checkEntityExistence(
-      Lector,
-      lectorId,
+    const existingLector = await this.checkEntityExistence(
+      this.lectorRepository,
+      lector,
       'Lector not found',
     );
 
-    await getConnection()
+    await this.marksRepository
       .createQueryBuilder()
       .insert()
       .into(Mark)
       .values({
         mark,
-        student,
-        lector,
-        course,
+        student: existingStudent,
+        lector: existingLector,
+        course: existingCourse,
       })
       .execute();
   }
@@ -70,12 +71,12 @@ export class MarksService {
     return mark;
   }
 
-  private async checkEntityExistence<TEntity>(
-    entityClass: TEntity,
+  async checkEntityExistence<TEntity>(
+    repository: Repository<TEntity>,
     entityId: string,
     errorMessage: string,
   ): Promise<TEntity> {
-    const entity = await this.marksRepository.findOne(entityId);
+    const entity = await repository.findOne(entityId as any);
 
     if (!entity) {
       throw new NotFoundException(errorMessage);
@@ -84,3 +85,29 @@ export class MarksService {
     return entity;
   }
 }
+
+// async addMark(markCreateData: CreateMarkDto): Promise<void> {
+//   const { mark, course, student, lector } = markCreateData;
+
+//   const [isCourse, isStudent, isLector] = await Promise.all([
+//     this.courseRepository.findOne(course),
+//     this.studentRepository.findOne(student),
+//     this.lectorRepository.findOne(lector),
+//   ]);
+
+//   if (!isCourse || !isStudent || !isLector) {
+//     const notFoundEntities = [];
+//     if (!isCourse) notFoundEntities.push('Course');
+//     if (!isStudent) notFoundEntities.push('Student');
+//     if (!isLector) notFoundEntities.push('Lector');
+
+//     throw new NotFoundException(`${notFoundEntities.join(', ')} not found`);
+//   }
+
+//   await this.markRepository.insert({
+//     mark,
+//     student: isStudent,
+//     lector: isLector,
+//     course: isCourse,
+//   });
+// }

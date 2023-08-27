@@ -8,24 +8,34 @@ import { Repository, DeleteResult, UpdateResult } from 'typeorm';
 import { Course } from './entities/course.entity';
 import { Mark } from '../marks/entities/mark.entity';
 import { Lector } from '../lectors/entities/lector.entity';
+import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { LectorCourse } from 'src/lector_course/lector_course.entity';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @InjectRepository(Course)
     private readonly coursesRepository: Repository<Course>,
-    @InjectRepository(Mark)
-    private readonly marksRepository: Repository<Mark>,
     @InjectRepository(Lector)
     private readonly lectorsRepository: Repository<Lector>,
+    @InjectRepository(LectorCourse)
+    private readonly lectorCourseRepository: Repository<LectorCourse>,
+    @InjectRepository(Mark)
+    private readonly marksRepository: Repository<Mark>,
   ) {}
 
   async getAllCourses(): Promise<Course[]> {
-    return this.coursesRepository.find({ relations: ['lectors', 'marks'] });
+    return await this.coursesRepository.find({
+      relations: ['lectors', 'marks'],
+    });
   }
 
   async getCourseById(courseId: string): Promise<Course> {
-    const course = await this.coursesRepository.findOne(courseId, {
+    const course = await this.coursesRepository.findOne({
+      where: {
+        id: courseId,
+      },
       relations: ['lectors', 'marks'],
     });
 
@@ -53,71 +63,68 @@ export class CoursesService {
     return marks;
   }
 
-  async getLectorsForCourse(lectorId: string): Promise<Course[]> {
-    const lector = await this.lectorsRepository.findOne(lectorId, {
-      relations: ['courses'],
-    });
+  async getCoursesByLectorId(lectorId: string): Promise<Course[]> {
+    const lectorCourses = await this.lectorCourseRepository
+      .createQueryBuilder('lector')
+      .innerJoinAndSelect('lector.courses', 'courses')
+      .where('lector.lectorId = :lectorId', { lectorId })
+      .getMany();
 
-    if (!lector) {
-      throw new BadRequestException('There is no such lector');
-    }
+    const courses = lectorCourses.flatMap((lc) => lc.courses);
 
-    if (!lector.courses) {
-      throw new BadRequestException('The lector does not have any courses');
-    }
-
-    return lector.courses;
+    return courses;
   }
 
-  async createCourse(courseCreateSchema: Omit<Course, 'id'>): Promise<Course> {
+  async createCourse(courseCreateSchema: CreateCourseDto): Promise<Course> {
     const course = await this.coursesRepository.findOne({
       where: {
         name: courseCreateSchema.name,
       },
     });
-
     if (course) {
       throw new BadRequestException('Course with this name already exists');
     }
-
     return this.coursesRepository.save(courseCreateSchema);
   }
 
   async addLectorToCourse(courseId: string, lectorId: string): Promise<Course> {
-    const course = await this.coursesRepository.findOne(courseId);
-    const lector = await this.lectorsRepository.findOne(lectorId);
+    const course = await this.coursesRepository.findOne({
+      where: {
+        id: courseId,
+      },
+    });
+    const lector = await this.lectorsRepository.findOne({
+      where: {
+        id: lectorId,
+      },
+    });
 
     if (!course || !lector) {
       throw new BadRequestException('There is no such id');
     }
 
-    if (!course.lectors) {
-      course.lectors = [];
-    }
-
-    if (!lector.courses) {
-      lector.courses = [];
-    }
-
-    course.lectors.push(lector);
-    lector.courses.push(course);
-
-    await this.coursesRepository.save(course);
-    await this.lectorsRepository.save(lector);
+    await this.lectorCourseRepository
+      .createQueryBuilder()
+      .insert()
+      .into(LectorCourse)
+      .values({
+        lectorId: lectorId,
+        courseId: courseId,
+      })
+      .execute();
 
     return course;
   }
 
   async updateCourseById(
     id: string,
-    courseUpdateSchema: Partial<Course>,
+    courseUpdateSchema: UpdateCourseDto,
   ): Promise<UpdateResult> {
     const result = await this.coursesRepository.update(id, courseUpdateSchema);
 
     if (!result.affected) {
       throw new NotFoundException('Course with this id is not found');
     }
-
     return result;
   }
 
@@ -127,7 +134,6 @@ export class CoursesService {
     if (!result.affected) {
       throw new NotFoundException('Course with this id is not found');
     }
-
     return result;
   }
 }

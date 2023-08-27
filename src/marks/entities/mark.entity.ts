@@ -19,5 +19,5 @@ export class Mark extends CoreEntity {
   lector: Lector;
 
   @ManyToOne(() => Course, (course) => course.marks)
-  courseId: Course;
+  course: Course;
 }
