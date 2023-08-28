@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { CoreEntity } from 'src/application/entities/core.entity';
-import { Lector } from 'src/lectors/entities/lector.entity';
-import { Course } from 'src/courses/entities/course.entity';
+import { CoreEntity } from '../application/entities/core.entity';
+import { Lector } from '../lectors/entities/lector.entity';
+import { Course } from '../courses/entities/course.entity';
 
 @Entity({ name: 'lector_course' })
 export class LectorCourse extends CoreEntity {

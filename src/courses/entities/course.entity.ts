@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../application/entities/core.entity';
-import { Lector } from 'src/lectors/entities/lector.entity';
-import { Mark } from 'src/marks/entities/mark.entity';
+import { Lector } from '../../lectors/entities/lector.entity';
+import { Mark } from '../../marks/entities/mark.entity';
 
 @Entity({ name: 'courses' })
 export class Course extends CoreEntity {

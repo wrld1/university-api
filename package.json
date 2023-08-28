@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "NODE_OPTIONS='-r dotenv/config' typeorm-ts-node-commonjs",
-    "typeorm:config": "NODE_PATH='src' npm run typeorm -- -d src/configs/database/data-source.ts",
+    "typeorm:config": "npm run typeorm -- -d src/configs/database/data-source.ts",
     "migrations:create": "npm run typeorm migration:create ./src/database/migrations/%npm_config_name%",
     "migrations:generate": "npm run typeorm:config migration:generate ./src/database/migrations/%npm_config_name%",
     "migrations:run": "npm run typeorm:config migration:run",

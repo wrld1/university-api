@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../application/entities/core.entity';
-import { Group } from 'src/groups/entities/group.entity';
-import { Mark } from 'src/marks/entities/mark.entity';
+import { Group } from '../../groups/entities/group.entity';
+import { Mark } from '../../marks/entities/mark.entity';
 
 @Entity({ name: 'students' })
 export class Student extends CoreEntity {
