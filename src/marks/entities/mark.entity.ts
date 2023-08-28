@@ -7,10 +7,10 @@ import { Course } from '../../courses/entities/course.entity';
 @Entity({ name: 'marks' })
 export class Mark extends CoreEntity {
   @Column({
-    type: 'varchar',
+    type: 'numeric',
     nullable: false,
   })
-  mark: string;
+  mark: number;
 
   @ManyToOne(() => Student, (student) => student.marks)
   student: Student;

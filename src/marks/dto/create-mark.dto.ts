@@ -7,7 +7,7 @@ export class CreateMarkDto {
   @Max(12)
   @IsNotEmpty()
   @ApiProperty()
-  mark: string;
+  mark: number;
 
   @IsNotEmpty()
   @ApiProperty()

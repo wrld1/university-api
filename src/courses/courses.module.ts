@@ -6,9 +6,12 @@ import { Mark } from 'src/marks/entities/mark.entity';
 import { Course } from './entities/course.entity';
 import { Student } from 'src/students/entities/student.entity';
 import { Lector } from 'src/lectors/entities/lector.entity';
+import { LectorCourse } from 'src/lector_course/lector_course.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Mark, Course, Student, Lector])],
+  imports: [
+    TypeOrmModule.forFeature([Mark, Course, Student, Lector, LectorCourse]),
+  ],
   controllers: [CoursesController],
   providers: [CoursesService],
 })
