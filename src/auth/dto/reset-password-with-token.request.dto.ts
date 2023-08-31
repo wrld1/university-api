@@ -5,7 +5,7 @@ export class ResetPasswordWithTokenRequestDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  username: string;
+  email: string;
 
   @IsNotEmpty()
   @IsString()

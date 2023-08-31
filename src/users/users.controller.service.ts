@@ -6,6 +6,7 @@ export class UsersControllerService {
   constructor(private readonly usersService: UsersService) {}
 
   public async findCurrentUser(userId: number) {
+    console.log('user.controller', userId);
     const user = await this.usersService.findById(userId);
     delete user.password;
     if (!user) {

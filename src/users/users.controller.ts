@@ -17,6 +17,10 @@ export class UsersController {
   @Get('me')
   public async findMe(@CurrentUser() loggedUser: User) {
     console.log(loggedUser);
-    return await this.usersControllerService.findCurrentUser(loggedUser.userId);
+    const response = await this.usersControllerService.findCurrentUser(
+      loggedUser.userId,
+    );
+    console.log(response);
+    return response;
   }
 }

@@ -18,43 +18,40 @@ export class AuthService {
     private resetTokenService: ResetTokenService,
   ) {}
 
-  public async signUp(
-    username: string,
-    pass: string,
-  ): Promise<SignResponseDto> {
-    const user = await this.usersService.create(username, pass);
-    const payload = { sub: user.userId, username: user.username };
+  public async signUp(email: string, pass: string): Promise<SignResponseDto> {
+    const user = await this.usersService.create(email, pass);
+    const payload = { sub: user.userId, email: user.email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
   }
 
   public async resetPasswordRequest(
-    username: string,
+    email: string,
   ): Promise<ResetTokenInterface> {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne(email);
     if (!user) {
       throw new BadRequestException(
-        `Cannot generate token for reset password request  because user ${username} is not found`,
+        `Cannot generate token for reset password request  because user ${email} is not found`,
       );
     }
-    return await this.resetTokenService.generateResetToken(username);
+    return await this.resetTokenService.generateResetToken(email);
   }
 
   public async resetPassword(
     resetPasswordWithTokenRequestDto: ResetPasswordWithTokenRequestDto,
   ): Promise<void> {
-    const { token, username, oldPassword, newPassword } =
+    const { token, email, oldPassword, newPassword } =
       resetPasswordWithTokenRequestDto;
     const resetPasswordRequest = await this.resetTokenService.getResetToken(
       token,
     );
     if (!resetPasswordRequest) {
       throw new BadRequestException(
-        `There is no request password request for user: ${username}`,
+        `There is no request password request for user: ${email}`,
       );
     }
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne(email);
     if (!user) {
       throw new BadRequestException(`User is not found`);
     }
@@ -65,15 +62,12 @@ export class AuthService {
     await this.resetTokenService.removeResetToken(token);
   }
 
-  public async signIn(
-    username: string,
-    pass: string,
-  ): Promise<SignResponseDto> {
-    const user = await this.usersService.findOne(username);
+  public async signIn(email: string, pass: string): Promise<SignResponseDto> {
+    const user = await this.usersService.findOne(email);
     if (user?.password !== pass) {
       throw new UnauthorizedException();
     }
-    const payload = { userId: user.userId, username: user.username };
+    const payload = { userId: user.userId, email: user.email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
