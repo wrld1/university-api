@@ -22,7 +22,7 @@ export class LectorsService {
     });
   }
 
-  async getLectorById(id: string): Promise<Lector> {
+  async getLectorById(id: string): Promise<Lector | undefined> {
     const lector = await this.lectorsRepository.findOne({
       where: { id: id },
       relations: ['courses'],
@@ -30,6 +30,16 @@ export class LectorsService {
 
     if (!lector) {
       throw new NotFoundException('Lector not found');
+    }
+
+    return lector;
+  }
+
+  async getLectorByEmail(email: string): Promise<Lector | undefined> {
+    const lector = await this.lectorsRepository.findOne({ where: { email } });
+
+    if (!lector) {
+      throw new NotFoundException(`Lector with email ${email} not found`);
     }
 
     return lector;

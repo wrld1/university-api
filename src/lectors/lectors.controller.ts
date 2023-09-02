@@ -8,17 +8,36 @@ import {
   Body,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { LectorsService } from './lectors.service';
 import { CreateLectorDto } from './dto/create-lector.dto';
 import { UpdateLectorDto } from './dto/update-lector.dto';
-import { ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Lector } from './entities/lector.entity';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current.user.decorator';
+import { LectorsControllerService } from './lectors.controller.service';
 
+@UseGuards(AuthGuard)
+@ApiBearerAuth('jwt')
 @ApiTags('Lectors')
 @Controller('lectors')
 export class LectorsController {
-  constructor(private readonly lectorsService: LectorsService) {}
+  constructor(
+    private readonly lectorsService: LectorsService,
+    private readonly lectorsControllerService: LectorsControllerService,
+  ) {}
+
+  @Get('me')
+  public async findMe(@CurrentUser() loggedLector: Lector) {
+    console.log(loggedLector);
+    const response = await this.lectorsControllerService.findCurrentLector(
+      loggedLector.id,
+    );
+    console.log(response);
+    return response;
+  }
 
   @Get()
   @ApiResponse({

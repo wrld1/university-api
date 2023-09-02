@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateLectorDto {
   @IsNotEmpty()
   @ApiProperty()
-  name: string;
+  name?: string;
 
   @IsEmail()
   @IsNotEmpty()

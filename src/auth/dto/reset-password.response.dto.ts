@@ -5,7 +5,7 @@ export class ResetPasswordResponseDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  username: string;
+  email: string;
 
   @IsNotEmpty()
   @IsString()

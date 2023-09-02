@@ -9,11 +9,9 @@ import { ConfigModule } from '../configs/config.module';
 import { LectorsModule } from 'src/lectors/lectors.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { MarksModule } from 'src/marks/marks.module';
-import { UsersModule } from 'src/users/users.module';
 import { AuthControllerModule } from 'src/auth/auth.controller.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ResetTokenModule } from 'src/reset-token/reset-token.module';
-import { UsersControllerModule } from 'src/users/users.controller.module';
 
 @Module({
   imports: [
@@ -25,11 +23,9 @@ import { UsersControllerModule } from 'src/users/users.controller.module';
     LectorsModule,
     PostsModule,
     MarksModule,
-    UsersModule,
     AuthControllerModule,
     AuthModule,
     ResetTokenModule,
-    UsersControllerModule,
   ],
   providers: [AppService],
 })

@@ -11,12 +11,10 @@ export class ResetTokenService {
   }
   private tokens = [];
 
-  public async generateResetToken(
-    username: string,
-  ): Promise<ResetTokenInterface> {
+  public async generateResetToken(email: string): Promise<ResetTokenInterface> {
     const token = crypto.randomBytes(32).toString('hex');
     const resetPasswordObject = {
-      username,
+      email,
       token,
     };
     this.tokens.push(resetPasswordObject);

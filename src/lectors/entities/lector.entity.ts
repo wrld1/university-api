@@ -7,7 +7,7 @@ import { Mark } from '../../marks/entities/mark.entity';
 export class Lector extends CoreEntity {
   @Column({
     type: 'varchar',
-    nullable: false,
+    nullable: true,
   })
   name: string;
 

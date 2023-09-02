@@ -29,7 +29,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
   public signIn(@Body() signInDto: SignRequestDto): Promise<SignResponseDto> {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
   @ApiOperation({ summary: 'Sign up' })
@@ -46,7 +46,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('sign-up')
   public signUp(@Body() signUpDto: SignRequestDto): Promise<SignResponseDto> {
-    return this.authService.signUp(signUpDto.username, signUpDto.password);
+    return this.authService.signUp(signUpDto.email, signUpDto.password);
   }
 
   @ApiOperation({ summary: 'Reset password request' })
@@ -65,7 +65,7 @@ export class AuthController {
   public resetPasswordRequest(
     @Body() resetPasswordDto: ResetPasswordRequestDto,
   ): Promise<ResetPasswordResponseDto> {
-    return this.authService.resetPasswordRequest(resetPasswordDto.username);
+    return this.authService.resetPasswordRequest(resetPasswordDto.email);
   }
 
   @ApiOperation({ summary: 'Reset password' })
