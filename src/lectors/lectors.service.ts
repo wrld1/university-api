@@ -8,6 +8,7 @@ import { UpdateResult, Repository, DeleteResult } from 'typeorm';
 import { CreateLectorDto } from './dto/create-lector.dto';
 import { UpdateLectorDto } from './dto/update-lector.dto';
 import { Lector } from './entities/lector.entity';
+import { hashPassword } from 'src/security/password.hasher';
 
 @Injectable()
 export class LectorsService {
@@ -46,17 +47,26 @@ export class LectorsService {
   }
 
   async createLector(lectorCreateSchema: CreateLectorDto): Promise<Lector> {
-    const { name } = lectorCreateSchema;
+    const { email, password } = lectorCreateSchema;
 
     const existingLector = await this.lectorsRepository.findOne({
-      where: { name },
+      where: { email },
     });
 
     if (existingLector) {
-      throw new BadRequestException('Lector with this name already exists');
+      throw new BadRequestException('Lector with this email already exists');
     }
 
-    return this.lectorsRepository.save(lectorCreateSchema);
+    const hashedPassword = await hashPassword(password);
+
+    const lector = this.lectorsRepository.create({
+      email,
+      password: hashedPassword,
+    });
+
+    console.log(hashedPassword);
+
+    return this.lectorsRepository.save(lector);
   }
 
   async updateLectorById(

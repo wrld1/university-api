@@ -5,6 +5,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { ResetTokenModule } from '../reset-token/reset-token.module';
 import { jwtConstants } from '../application/constants/auth.constants';
 import { LectorsModule } from 'src/lectors/lectors.module';
+import { MailService } from 'src/mail/mail.service';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
@@ -15,8 +17,9 @@ import { LectorsModule } from 'src/lectors/lectors.module';
       signOptions: { expiresIn: '60s' },
     }),
     ResetTokenModule,
+    MailModule,
   ],
-  providers: [AuthService, AuthGuard],
+  providers: [AuthService, AuthGuard, MailService],
   exports: [AuthService],
 })
 export class AuthModule {}

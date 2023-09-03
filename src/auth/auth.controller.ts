@@ -1,4 +1,11 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignRequestDto } from './dto/sign.request.dto';
 import { SignResponseDto } from './dto/sign.response.dto';
@@ -81,8 +88,10 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('reset-password')
   public resetPassword(
+    @Query('token') token: string,
+    @Query('id') lectorId: string,
     @Body() resetPasswordDto: ResetPasswordWithTokenRequestDto,
   ): Promise<void> {
-    return this.authService.resetPassword(resetPasswordDto);
+    return this.authService.resetPassword(resetPasswordDto, token, lectorId);
   }
 }
