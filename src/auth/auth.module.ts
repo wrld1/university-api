@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
@@ -19,7 +20,15 @@ import { MailModule } from 'src/mail/mail.module';
     ResetTokenModule,
     MailModule,
   ],
-  providers: [AuthService, AuthGuard, MailService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    AuthService,
+    AuthGuard,
+    MailService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

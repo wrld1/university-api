@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Get,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignRequestDto } from './dto/sign.request.dto';
@@ -13,10 +15,18 @@ import { ResetPasswordRequestDto } from './dto/reset-password.request.dto';
 import { ResetPasswordWithTokenRequestDto } from './dto/reset-password-with-token.request.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResetPasswordResponseDto } from './dto/reset-password.response.dto';
+import { Public } from './decorators/public.route.decorator';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('is-authenticated')
+  @UseGuards(AuthGuard)
+  isAuthenticated() {
+    return { authenticated: true };
+  }
 
   @ApiOperation({ summary: 'Sign in' })
   @ApiResponse({
@@ -34,6 +44,7 @@ export class AuthController {
     description: 'Something went wrong',
   })
   @HttpCode(HttpStatus.OK)
+  @Public()
   @Post('sign-in')
   public signIn(@Body() signInDto: SignRequestDto): Promise<SignResponseDto> {
     return this.authService.signIn(signInDto.email, signInDto.password);
@@ -51,6 +62,7 @@ export class AuthController {
     description: 'Something went wrong',
   })
   @HttpCode(HttpStatus.OK)
+  @Public()
   @Post('sign-up')
   public signUp(@Body() signUpDto: SignRequestDto): Promise<SignResponseDto> {
     return this.authService.signUp(signUpDto.email, signUpDto.password);
@@ -68,6 +80,7 @@ export class AuthController {
     description: 'Something went wrong',
   })
   @HttpCode(HttpStatus.OK)
+  @Public()
   @Post('reset-password-request')
   public resetPasswordRequest(
     @Body() resetPasswordDto: ResetPasswordRequestDto,
@@ -86,6 +99,7 @@ export class AuthController {
     description: 'Something went wrong',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Public()
   @Post('reset-password')
   public resetPassword(
     @Query('token') token: string,
