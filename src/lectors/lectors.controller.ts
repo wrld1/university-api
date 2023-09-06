@@ -31,11 +31,11 @@ export class LectorsController {
 
   @Get('me')
   public async findMe(@CurrentUser() loggedLector: Lector) {
-    console.log(loggedLector);
+    console.log(`This is logged lector${loggedLector.id}`);
     const response = await this.lectorsControllerService.findCurrentLector(
       loggedLector.id,
     );
-    console.log(response);
+    console.log(`This is kirilla response : ${response}`);
     return response;
   }
 

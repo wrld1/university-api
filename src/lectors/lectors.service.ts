@@ -24,9 +24,8 @@ export class LectorsService {
   }
 
   async getLectorById(id: string): Promise<Lector | undefined> {
-    const lector = await this.lectorsRepository.findOne({
-      where: { id: id },
-      relations: ['courses'],
+    const lector = await this.lectorsRepository.findOneBy({
+      id: id,
     });
 
     if (!lector) {
@@ -57,16 +56,11 @@ export class LectorsService {
       throw new BadRequestException('Lector with this email already exists');
     }
 
-    const hashedPassword = await hashPassword(password);
+    lectorCreateSchema.password = await hashPassword(password);
 
-    const lector = this.lectorsRepository.create({
-      email,
-      password: hashedPassword,
-    });
+    console.log(lectorCreateSchema);
 
-    console.log(hashedPassword);
-
-    return this.lectorsRepository.save(lector);
+    return this.lectorsRepository.save(lectorCreateSchema);
   }
 
   async updateLectorById(

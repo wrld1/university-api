@@ -5,8 +5,8 @@ import { LectorsService } from './lectors.service';
 export class LectorsControllerService {
   constructor(private readonly lectorsService: LectorsService) {}
 
-  public async findCurrentLector(lectorId: string) {
-    const lector = await this.lectorsService.getLectorById(lectorId);
+  public async findCurrentLector(id: string) {
+    const lector = await this.lectorsService.getLectorById(id);
     delete lector.password;
     if (!lector) {
       throw new NotFoundException(`Lector is not found`);

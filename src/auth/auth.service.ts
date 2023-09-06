@@ -24,11 +24,11 @@ export class AuthService {
   ) {}
 
   public async signUp(email: string, pass: string): Promise<SignResponseDto> {
-    const lector = await this.lectorsService.createLector({
+    await this.lectorsService.createLector({
       email: email,
       password: pass,
     });
-    const payload = { sub: lector.id, email: lector.email };
+    const payload = { sub: email, password: pass };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
