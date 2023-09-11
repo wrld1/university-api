@@ -28,22 +28,27 @@ export class AuthService {
       email: email,
       password: pass,
     });
-    const payload = { sub: email, password: pass };
+    //add id from lector after getlector by email
+    const payload = { sub: email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
   }
 
-  public async signIn(email: string, pass: string): Promise<SignResponseDto> {
-    const lector = await this.lectorsService.getLectorByEmail(email);
+  public async signIn(
+    userEmail: string,
+    pass: string,
+  ): Promise<SignResponseDto> {
+    const { id, email, password } =
+      await this.lectorsService.getLectorByEmail(userEmail);
 
-    const passwordMatch = await comparePasswords(pass, lector.password);
+    const passwordMatch = await comparePasswords(pass, password);
 
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const payload = { lectorId: lector.id, email: lector.email };
+    const payload = { id, email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
@@ -102,8 +107,6 @@ export class AuthService {
     }
 
     const hashedNewPassword = await hashPassword(newPassword);
-
-    console.log(hashedNewPassword);
 
     await this.lectorsService.updateLectorById(lector.id, {
       password: hashedNewPassword,

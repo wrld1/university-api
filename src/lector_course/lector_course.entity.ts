@@ -11,11 +11,17 @@ export class LectorCourse extends CoreEntity {
   @PrimaryColumn({ name: 'course_id' })
   courseId: string;
 
-  @ManyToOne(() => Lector, (lector) => lector.courses)
+  @ManyToOne(() => Lector, (lector) => lector.courses, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
   @JoinColumn([{ name: 'lector_id', referencedColumnName: 'id' }])
   lectors: Lector[];
 
-  @ManyToOne(() => Course, (course) => course.lectors)
+  @ManyToOne(() => Course, (course) => course.lectors, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
   @JoinColumn([{ name: 'course_id', referencedColumnName: 'id' }])
   courses: Course[];
 }

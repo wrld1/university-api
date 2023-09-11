@@ -58,8 +58,6 @@ export class LectorsService {
 
     lectorCreateSchema.password = await hashPassword(password);
 
-    console.log(lectorCreateSchema);
-
     return this.lectorsRepository.save(lectorCreateSchema);
   }
 

@@ -22,7 +22,7 @@ import { AuthGuard } from './guards/auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Get('is-authenticated')
+  @Get('authenticated')
   @UseGuards(AuthGuard)
   isAuthenticated() {
     return { authenticated: true };

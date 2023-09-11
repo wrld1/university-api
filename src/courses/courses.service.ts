@@ -108,8 +108,8 @@ export class CoursesService {
       .insert()
       .into(LectorCourse)
       .values({
-        lectorId: lectorId,
-        courseId: courseId,
+        lectorId,
+        courseId,
       })
       .execute();
 

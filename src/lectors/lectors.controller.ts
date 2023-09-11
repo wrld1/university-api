@@ -18,6 +18,7 @@ import { Lector } from './entities/lector.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current.user.decorator';
 import { LectorsControllerService } from './lectors.controller.service';
+import { Public } from 'src/auth/decorators/public.route.decorator';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth('jwt')
@@ -31,11 +32,9 @@ export class LectorsController {
 
   @Get('me')
   public async findMe(@CurrentUser() loggedLector: Lector) {
-    console.log(`This is logged lector${loggedLector.id}`);
     const response = await this.lectorsControllerService.findCurrentLector(
       loggedLector.id,
     );
-    console.log(`This is kirilla response : ${response}`);
     return response;
   }
 
@@ -50,6 +49,7 @@ export class LectorsController {
     description:
       'The HTTP version used in the request is not supported by the server.',
   })
+  @Public()
   async getAllLectors() {
     return this.lectorsService.getAllLectors();
   }
