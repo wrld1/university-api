@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-// import * as bcrypt from 'bcrypt';
 import { ResetTokenService } from '../reset-token/reset-token.service';
 import { SignResponseDto } from './dto/sign.response.dto';
 import { ResetTokenInterface } from '../reset-token/interfaces/reset-token.interface';
@@ -28,7 +27,6 @@ export class AuthService {
       email: email,
       password: pass,
     });
-    //add id from lector after getlector by email
     const payload = { sub: email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
@@ -66,7 +64,7 @@ export class AuthService {
 
     const resetToken = await this.resetTokenService.generateResetToken(email);
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken.token}&id=${lector.id}`;
+    const resetLink = `${process.env.RESET_LINK}?token=${resetToken.token}&id=${lector.id}`;
 
     await this.mailService.sendResetLink(email, resetLink);
 
@@ -87,11 +85,6 @@ export class AuthService {
         `There is no reset password request for lector: ${email}`,
       );
     }
-    // const isValid = await bcrypt.compare(token, resetPasswordRequest.token);
-
-    // if (!isValid) {
-    //   throw new Error('Invalid or expired password reset token');
-    // }
     const lector = await this.lectorsService.getLectorById(lectorId);
     if (!lector) {
       throw new BadRequestException(`Lector is not found`);

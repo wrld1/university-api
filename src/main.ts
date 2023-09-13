@@ -1,16 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './application/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     whitelist: true,
-  //     forbidNonWhitelisted: true,
-  //   }),
-  // );
+
+  // app.use('/public', express.static(path.join(__dirname, '../../', 'public')));
+
   const swaggerOptions = new DocumentBuilder()
     .setTitle('University API')
     .addBearerAuth(

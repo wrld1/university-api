@@ -32,7 +32,7 @@ export class CreateStudentDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  imagePath: string;
+  imagePath?: string;
 
   @IsOptional()
   @IsString()

@@ -186,32 +186,56 @@ export class StudentsController {
     return student;
   }
 
-  @Put(':id/add-image')
-  @ApiResponse({
-    status: 204,
-    description: 'Image added to student successfully',
-    type: Student,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Student not found',
-  })
-  @ApiResponse({
-    status: 505,
-    description:
-      'The HTTP version used in the request is not supported by the server.',
-  })
-  @ApiParam({ name: 'id', type: 'string', description: 'Student ID' })
-  async addImage(
-    @Param('id') id: string,
-    @Body('imagePath') imagePath: string,
-  ): Promise<Student> {
-    const updatedStudent = await this.studentsService.addImage(id, imagePath);
-    if (!updatedStudent) {
-      throw new NotFoundException('Student not found');
-    }
-    return updatedStudent;
-  }
+  // @ApiResponse({ status: 201, description: 'Image uploaded successfully' })
+  // @Post(':id/image')
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: diskStorage({
+  //       destination: './public',
+  //       filename: (req, file, cb) => {
+  //         const randomName = Array(32)
+  //           .fill(null)
+  //           .map(() => Math.round(Math.random() * 16).toString(16))
+  //           .join('');
+  //         return cb(null, `${randomName}${extname(file.originalname)}`);
+  //       },
+  //     }),
+  //   }),
+  // )
+  // async uploadImage(
+  //   @Param('id') id: string,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ) {
+  //   await this.studentsService.addImage(id, file);
+  //   return { imagePath: file.path };
+  // }
+
+  // @Get('image/:id')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Image retrieved successfully',
+  // })
+  // async getImage(@Param('id') id: number, @Res() res: any) {
+  //   try {
+  //     const filename = await this.studentsService.getImage(id);
+
+  //     res.send(filename);
+  //   } catch (error) {
+  //     res.status(error).json({ message: error });
+  //   }
+  // }
 
   @Delete(':id')
   @ApiResponse({

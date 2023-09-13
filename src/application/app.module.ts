@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { AppService } from './app.service';
 import { typeOrmAsyncConfig } from 'src/configs/database/typeorm-config';
 import { StudentsModule } from 'src/students/students.module';
 import { GroupsModule } from 'src/groups/groups.module';
@@ -21,11 +20,11 @@ import { MailModule } from 'src/mail/mail.module';
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'sandbox.smtp.mailtrap.io',
+          host: `${process.env.MAILER_HOST}`,
           port: 2525,
           auth: {
-            user: '8487f7dd0044b8',
-            pass: 'fc843ae86ded39',
+            user: `${process.env.MAILER__USER}`,
+            pass: `${process.env.MAILER__PASSWORD}`,
           },
         },
         defaults: {
@@ -45,6 +44,6 @@ import { MailModule } from 'src/mail/mail.module';
     AuthModule,
     ResetTokenModule,
   ],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

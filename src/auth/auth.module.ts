@@ -8,6 +8,8 @@ import { jwtConstants } from '../application/constants/auth.constants';
 import { LectorsModule } from 'src/lectors/lectors.module';
 import { MailService } from 'src/mail/mail.service';
 import { MailModule } from 'src/mail/mail.module';
+// import { ServeStaticModule } from '@nestjs/serve-static';
+// import { join } from 'path';
 
 @Module({
   imports: [
@@ -17,6 +19,10 @@ import { MailModule } from 'src/mail/mail.module';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '30m' },
     }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'public'),
+    //   serveRoot: '/public',
+    // }),
     ResetTokenModule,
     MailModule,
   ],
