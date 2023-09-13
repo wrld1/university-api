@@ -9,6 +9,7 @@ import { CreateLectorDto } from './dto/create-lector.dto';
 import { UpdateLectorDto } from './dto/update-lector.dto';
 import { Lector } from './entities/lector.entity';
 import { hashPassword } from 'src/security/password.hasher';
+import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
 
 @Injectable()
 export class LectorsService {
@@ -17,10 +18,26 @@ export class LectorsService {
     private readonly lectorsRepository: Repository<Lector>,
   ) {}
 
-  async getAllLectors(): Promise<Lector[]> {
-    return await this.lectorsRepository.find({
+  // async getAllLectors(): Promise<Lector[]> {
+  //   return await this.lectorsRepository.find({
+  //     relations: ['courses'],
+  //   });
+  // }
+
+  async getAllLectors(queryFilter: QueryFilterDto): Promise<Lector[]> {
+    const options = {};
+    const { sortField, sortOrder } = queryFilter;
+
+    if (sortField) {
+      options['order'] = { [sortField]: sortOrder };
+    }
+
+    const lectors = await this.lectorsRepository.find({
+      ...options,
       relations: ['courses'],
     });
+
+    return lectors;
   }
 
   async getLectorById(id: string): Promise<Lector | undefined> {

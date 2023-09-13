@@ -3,12 +3,13 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Repository, Like, FindManyOptions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { Student } from './entities/student.entity';
+import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
 
 @Injectable()
 export class StudentsService {
@@ -17,22 +18,19 @@ export class StudentsService {
     private readonly studentsRepository: Repository<Student>,
   ) {}
 
-  async getAllStudents(name?: string): Promise<Student[]> {
-    const options: FindManyOptions<Student> = {};
+  async getAllStudents(queryFilter: QueryFilterDto): Promise<Student[]> {
+    const options = {};
+    const { sortField, sortOrder } = queryFilter;
 
-    if (name) {
-      options.where = { name: Like(`%${name}%`) };
+    if (sortField) {
+      options['order'] = { [sortField]: sortOrder };
     }
 
-    const students = await this.studentsRepository.find(options);
+    const students = await this.studentsRepository.find({
+      ...options,
+    });
 
-    if (!name) {
-      return students;
-    }
-
-    return students.filter((student) =>
-      student.name.toLowerCase().includes(name.toLowerCase()),
-    );
+    return students;
   }
 
   async getStudentById(id: string): Promise<Student> {

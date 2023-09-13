@@ -9,6 +9,8 @@ import {
   Body,
   NotFoundException,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -23,6 +25,26 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Observable, of } from 'rxjs';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { Public } from 'src/auth/decorators/public.route.decorator';
+import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
+
+export const storage = {
+  storage: diskStorage({
+    destination: '../uploads',
+    filename: (req, file, cb) => {
+      const filename: string =
+        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
+
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+};
 
 @ApiTags('Students')
 @Controller('students')
@@ -47,8 +69,10 @@ export class StudentsController {
     description:
       'The HTTP version used in the request is not supported by the server.',
   })
-  async getAllStudents(@Query('name') name?: string): Promise<Student[]> {
-    return this.studentsService.getAllStudents(name);
+  async getAllStudents(
+    @Query() queryFilter?: QueryFilterDto,
+  ): Promise<Student[]> {
+    return this.studentsService.getAllStudents(queryFilter);
   }
 
   @Get(':id')
@@ -184,6 +208,16 @@ export class StudentsController {
       throw new NotFoundException('Student not found');
     }
     return student;
+  }
+
+  @Public()
+  @Post(':id/upload')
+  @UseInterceptors(FileInterceptor('file', storage))
+  uploadImage(
+    @Param('id') id: string,
+    @UploadedFile() file,
+  ): Observable<object> {
+    return of({ imagePath: file.filename });
   }
 
   // @ApiResponse({ status: 201, description: 'Image uploaded successfully' })

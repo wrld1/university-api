@@ -9,6 +9,7 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { LectorsService } from './lectors.service';
 import { CreateLectorDto } from './dto/create-lector.dto';
@@ -19,6 +20,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current.user.decorator';
 import { LectorsControllerService } from './lectors.controller.service';
 import { Public } from 'src/auth/decorators/public.route.decorator';
+import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth('jwt')
@@ -50,8 +52,8 @@ export class LectorsController {
       'The HTTP version used in the request is not supported by the server.',
   })
   @Public()
-  async getAllLectors() {
-    return this.lectorsService.getAllLectors();
+  async getAllLectors(@Query() queryFilter?: QueryFilterDto) {
+    return this.lectorsService.getAllLectors(queryFilter);
   }
 
   @Get(':id')
