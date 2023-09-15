@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -19,29 +20,30 @@ import { AddGroupToStudentDto } from './dto/add-group-to-student.dto';
 import { Student } from './entities/student.entity';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Observable, of } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Public } from 'src/auth/decorators/public.route.decorator';
 import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
+import { FileUploadDto } from './dto/file-upload.dto';
 
 export const storage = {
   storage: diskStorage({
-    destination: '../uploads',
+    destination: 'uploads',
     filename: (req, file, cb) => {
       const filename: string =
         path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
       const extension: string = path.parse(file.originalname).ext;
 
-      cb(null, `${filename}${extension}`);
+      return cb(null, `${filename}${extension}`);
     },
   }),
 };
@@ -126,6 +128,7 @@ export class StudentsController {
     return student;
   }
 
+  @Public()
   @Post()
   @ApiResponse({
     status: 201,
@@ -210,66 +213,36 @@ export class StudentsController {
     return student;
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: FileUploadDto })
+  @ApiParam({ name: 'id', description: 'The ID of the student' })
+  @ApiResponse({ status: 201, description: 'Image uploaded successfully' })
   @Public()
   @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', storage))
-  uploadImage(
+  async uploadImage(
     @Param('id') id: string,
-    @UploadedFile() file,
-  ): Observable<object> {
-    return of({ imagePath: file.filename });
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    await this.studentsService.addImage(id, file);
+    return { imagePath: file.path };
   }
 
-  // @ApiResponse({ status: 201, description: 'Image uploaded successfully' })
-  // @Post(':id/image')
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       file: {
-  //         type: 'string',
-  //         format: 'binary',
-  //       },
-  //     },
-  //   },
-  // })
-  // @UseInterceptors(
-  //   FileInterceptor('file', {
-  //     storage: diskStorage({
-  //       destination: './public',
-  //       filename: (req, file, cb) => {
-  //         const randomName = Array(32)
-  //           .fill(null)
-  //           .map(() => Math.round(Math.random() * 16).toString(16))
-  //           .join('');
-  //         return cb(null, `${randomName}${extname(file.originalname)}`);
-  //       },
-  //     }),
-  //   }),
-  // )
-  // async uploadImage(
-  //   @Param('id') id: string,
-  //   @UploadedFile() file: Express.Multer.File,
-  // ) {
-  //   await this.studentsService.addImage(id, file);
-  //   return { imagePath: file.path };
-  // }
+  @Public()
+  @Get(':id/image')
+  @ApiResponse({
+    status: 200,
+    description: 'Image retrieved successfully',
+  })
+  async getImage(@Param('id') id: string, @Res() res: any) {
+    try {
+      const filename = await this.studentsService.getImage(id);
 
-  // @Get('image/:id')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Image retrieved successfully',
-  // })
-  // async getImage(@Param('id') id: number, @Res() res: any) {
-  //   try {
-  //     const filename = await this.studentsService.getImage(id);
-
-  //     res.send(filename);
-  //   } catch (error) {
-  //     res.status(error).json({ message: error });
-  //   }
-  // }
+      res.send(filename);
+    } catch (error) {
+      res.status(error).json({ message: error });
+    }
+  }
 
   @Delete(':id')
   @ApiResponse({

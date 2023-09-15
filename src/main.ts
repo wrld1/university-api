@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './application/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
-import express from 'express';
+import * as express from 'express';
 import path from 'path';
 
 dotenv.config();
@@ -11,7 +11,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
 
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  app.use(
+    '/uploads',
+    express.static(path.join(__dirname, '../../', 'uploads')),
+  );
+
+  const pathTest = path.join(__dirname, '../../', 'uploads');
+  console.log(pathTest);
 
   const swaggerOptions = new DocumentBuilder()
     .setTitle('University API')

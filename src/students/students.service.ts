@@ -118,26 +118,27 @@ export class StudentsService {
     return student;
   }
 
-  // async addImage(id, file: Express.Multer.File): Promise<Student> {
-  //   const student = await this.studentsRepository.findOne({ where: { id } });
-  //   if (!student) {
-  //     throw new NotFoundException('Student not found');
-  //   }
+  async addImage(id: string, file: Express.Multer.File): Promise<Student> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
 
-  //   student.imagePath = file.filename;
-  //   await this.studentsRepository.save(student);
-  //   return student;
-  // }
+    student.imagePath = file.filename;
 
-  // async getImage(id): Promise<string | null> {
-  //   const student = await this.studentsRepository.findOne({ where: { id } });
+    await this.studentsRepository.save(student);
+    return student;
+  }
 
-  //   if (!student || !student.imagePath) {
-  //     throw new NotFoundException('Students image not found');
-  //   }
+  async getImage(id: string): Promise<string | null> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
 
-  //   return student.imagePath;
-  // }
+    if (!student || !student.imagePath) {
+      throw new NotFoundException('Students image not found');
+    }
+
+    return student.imagePath;
+  }
 
   async deleteStudentById(id: string): Promise<DeleteResult> {
     const result = await this.studentsRepository.delete(id);
