@@ -3,12 +3,13 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Repository, Like, FindManyOptions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { Student } from './entities/student.entity';
+import { QueryFilterDto } from 'src/application/dto/query.filter.dto';
 
 @Injectable()
 export class StudentsService {
@@ -17,22 +18,19 @@ export class StudentsService {
     private readonly studentsRepository: Repository<Student>,
   ) {}
 
-  async getAllStudents(name?: string): Promise<Student[]> {
-    const options: FindManyOptions<Student> = {};
+  async getAllStudents(queryFilter: QueryFilterDto): Promise<Student[]> {
+    const options = {};
+    const { sortField, sortOrder } = queryFilter;
 
-    if (name) {
-      options.where = { name: Like(`%${name}%`) };
+    if (sortField) {
+      options['order'] = { [sortField]: sortOrder };
     }
 
-    const students = await this.studentsRepository.find(options);
+    const students = await this.studentsRepository.find({
+      ...options,
+    });
 
-    if (!name) {
-      return students;
-    }
-
-    return students.filter((student) =>
-      student.name.toLowerCase().includes(name.toLowerCase()),
-    );
+    return students;
   }
 
   async getStudentById(id: string): Promise<Student> {
@@ -120,26 +118,27 @@ export class StudentsService {
     return student;
   }
 
-  // async addImage(id, file: Express.Multer.File): Promise<Student> {
-  //   const student = await this.studentsRepository.findOne({ where: { id } });
-  //   if (!student) {
-  //     throw new NotFoundException('Student not found');
-  //   }
+  async addImage(id: string, file: Express.Multer.File): Promise<Student> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
 
-  //   student.imagePath = file.filename;
-  //   await this.studentsRepository.save(student);
-  //   return student;
-  // }
+    student.imagePath = file.filename;
 
-  // async getImage(id): Promise<string | null> {
-  //   const student = await this.studentsRepository.findOne({ where: { id } });
+    await this.studentsRepository.save(student);
+    return student;
+  }
 
-  //   if (!student || !student.imagePath) {
-  //     throw new NotFoundException('Students image not found');
-  //   }
+  async getImage(id: string): Promise<string | null> {
+    const student = await this.studentsRepository.findOne({ where: { id } });
 
-  //   return student.imagePath;
-  // }
+    if (!student || !student.imagePath) {
+      throw new NotFoundException('Students image not found');
+    }
+
+    return student.imagePath;
+  }
 
   async deleteStudentById(id: string): Promise<DeleteResult> {
     const result = await this.studentsRepository.delete(id);

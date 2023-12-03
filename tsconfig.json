@@ -10,11 +10,14 @@
     "lib": ["ES2020", "DOM"],
     "module": "commonjs",
     "outDir": "./dist",
+    "rootDir": ".",
     "removeComments": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "target": "ES2015",
-    "types": ["node", "express", "multer"]
+    "paths": {
+      "@nestjs/*": ["node_modules/@nestjs/*"]
+    }
   },
   "include": ["src/database/migrations/*", "src/**/*"],
   "exclude": ["node_modules"]

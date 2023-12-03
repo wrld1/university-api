@@ -13,6 +13,8 @@ import { AuthControllerModule } from 'src/auth/auth.controller.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ResetTokenModule } from 'src/reset-token/reset-token.module';
 import { MailModule } from 'src/mail/mail.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -31,6 +33,10 @@ import { MailModule } from 'src/mail/mail.module';
           from: 'your.email@gmail.com',
         },
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     MailModule,
     ConfigModule,
